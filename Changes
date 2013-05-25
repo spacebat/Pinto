@@ -12,6 +12,13 @@
       ship together, they all have the same version number.  So there is
       no need for a special version command.  If you want to know what version
       of pinto you have, just use the --version option.
+
+      ENHANCEMENTS:
+
+      Improved indexing to be more like PAUSE.  Pinto will still index
+      packages that do not match the filename, but only if that package
+      has never been seen before in a file that did match.  This is known
+      as a "simile" in the PAUSE codebase.
       
 
 0.084     2013-05-14 17:24:22 America/Los_Angeles
