@@ -239,11 +239,13 @@ sub register {
     
     for my $pkg ($self->packages) {
 
+      $DB::single++ if $pkg->name =~ /PP/;
       if (not $pkg->is_simile) {
 
         my $pkg_name = $pkg->name;
         my $pkg_file = $pkg->file;
-        my @old_pkgs = $self->repo->get_package(name => $pkg_name);
+        my $schema = $self->result_source->schema;
+        my @old_pkgs = $schema->search_package({name => $pkg_name});
         if ( my $simile = first {$_->is_simile} reverse @old_pkgs ) {
           debug( sub {"Package $pkg_name in file $pkg_file is not a simile"} );
           debug( sub {"Not registering $pkg because it was a simile in $simile"} );
