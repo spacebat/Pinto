@@ -189,6 +189,7 @@ with 'Pinto::Role::Schema::Result';
 use URI;
 use CPAN::Meta;
 use Path::Class;
+use List::Util qw(first);
 use CPAN::DistnameInfo;
 use String::Format;
 
@@ -238,14 +239,26 @@ sub register {
     
     for my $pkg ($self->packages) {
 
+      if (not $pkg->is_simile) {
+
+        my $pkg_name = $pkg->name;
+        my $pkg_file = $pkg->file;
+        my @old_pkgs = $self->repo->get_package(name => $pkg_name);
+        if ( my $simile = first {$_->is_simile} reverse @old_pkgs ) {
+          debug( sub {"Package $pkg_name in file $pkg_file is not a simile"} );
+          debug( sub {"Not registering $pkg because it was a simile in $simile"} );
+          next;
+        }
+      }
+
       my $where = {package_name => $pkg->name};
       my $incumbent = $stack->head->find_related(registrations => $where);
 
       if (not defined $incumbent) {
-          debug( sub {"Registering $pkg on stack $stack"} );
-          $pkg->register(stack => $stack, pin => $pin);
-          $did_register++;
-          next;
+        debug( sub {"Registering $pkg on stack $stack"} );
+        $pkg->register(stack => $stack, pin => $pin);
+        $did_register++;
+        next;
       }
 
       my $incumbent_pkg = $incumbent->package;

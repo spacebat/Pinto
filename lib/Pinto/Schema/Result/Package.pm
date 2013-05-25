@@ -236,6 +236,27 @@ sub as_spec {
 
 #------------------------------------------------------------------------------
 
+sub is_simile {
+    my ($self) = @_;
+
+    # Based on simile() from PAUSE's pmfile.pm
+
+    my $file = $self->file;
+    return 0 if not $file;
+
+    $file =~ s|.*/||;
+    $file =~ s|\.pm(?:\.PL)?||;
+
+    my $ret = $self->name =~ m/\b\Q$file\E$/;
+
+    # Some dists use a "version" module
+    $ret = 1 if lc $file eq 'version';
+
+    return $ret || 0;
+}
+
+#------------------------------------------------------------------------------
+
 sub to_string {
     my ($self, $format) = @_;
 
